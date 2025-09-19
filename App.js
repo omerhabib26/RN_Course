@@ -1,78 +1,43 @@
-import AppLoading from "expo-app-loading";
-import { useFonts } from "expo-font";
-import { LinearGradient } from "expo-linear-gradient";
+import { NavigationContainer } from "@react-navigation/native";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { StatusBar } from "expo-status-bar";
-import { useState } from "react";
-import { ImageBackground, StyleSheet } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
-import Colors from "./constants/colors";
-import GameOverScreen from "./screens/GameOverScreen";
-import GameScreen from "./screens/GameScreen";
-import StartGameScreen from "./screens/StartGameScreen";
+import { StyleSheet } from "react-native";
+import CategoriesScreen from "./screens/CategoriesScreen";
+import MealDetailScreen from "./screens/MealDetailScreen";
+import MealsOverviewScreen from "./screens/MealsOverviewScreen";
+
+const Stack = createNativeStackNavigator();
 
 export default function App() {
-  const [userNumber, setUserNumber] = useState();
-  const [gameIsOver, setGameIsOver] = useState(true);
-  const [guessRounds, setGuessRounds] = useState(0);
-
-  const [fontsLoaded] = useFonts({
-    "open-sans": require("./assets/fonts/OpenSans-Regular.ttf"),
-    "open-sans-bold": require("./assets/fonts/OpenSans-Bold.ttf"),
-  });
-
-  if (!fontsLoaded) {
-    return <AppLoading />;
-  }
-
-  function pickedNumberHandler(pickedNumber) {
-    setUserNumber(pickedNumber);
-    setGameIsOver(false);
-  }
-
-  function gameOverHandler(numberOfRounds) {
-    setGameIsOver(true);
-    setGuessRounds(numberOfRounds);
-  }
-
-  function startNewGameHandler() {
-    setUserNumber(null);
-    setGuessRounds(0);
-  }
-
-  let screen = <StartGameScreen onPickNumber={pickedNumberHandler} />;
-
-  if (userNumber) {
-    screen = (
-      <GameScreen userNumber={userNumber} onGameOver={gameOverHandler} />
-    );
-  }
-
-  if (gameIsOver && userNumber) {
-    screen = (
-      <GameOverScreen
-        userNumber={userNumber}
-        onStartNewGame={startNewGameHandler}
-        rounds={guessRounds}
-      />
-    );
-  }
-
   return (
     <>
-      <StatusBar style="light" />
-      <LinearGradient
-        colors={[Colors.primary800, Colors.accent500]}
-        style={styles.rootScreen}
-      >
-        <ImageBackground
-          source={require("./assets/images/background.png")}
-          resizeMode="cover"
-          style={styles.rootScreen}
-          imageStyle={styles.backgroundImage}
+      <StatusBar style="light" translucent={false} backgroundColor="#351401" />
+      <NavigationContainer>
+        <Stack.Navigator
+          screenOptions={{
+            headerStyle: { backgroundColor: "#351401" },
+            headerTintColor: "white",
+            contentStyle: {
+              backgroundColor: "#4c3629ff",
+            },
+          }}
         >
-          <SafeAreaView style={styles.rootScreen}>{screen}</SafeAreaView>
-        </ImageBackground>
-      </LinearGradient>
+          <Stack.Screen
+            name="MealsCategories"
+            component={CategoriesScreen}
+            options={{
+              title: "All Categories",
+              headerStyle: { backgroundColor: "#351401" },
+              headerTintColor: "white",
+              contentStyle: {
+                backgroundColor: "#4c3629ff",
+              },
+            }}
+          />
+          <Stack.Screen name="MealsOverview" component={MealsOverviewScreen} />
+          <Stack.Screen name="MealDetail" component={MealDetailScreen} />
+        </Stack.Navigator>
+      </NavigationContainer>
     </>
   );
 }
@@ -80,9 +45,9 @@ export default function App() {
 const styles = StyleSheet.create({
   rootScreen: {
     flex: 1,
-  },
-
-  backgroundImage: {
-    opacity: 0.15,
+    marginTop: 16,
+    backgroundColor: "#fff",
+    alignItems: "center",
+    justifyContent: "center",
   },
 });
