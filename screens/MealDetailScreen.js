@@ -14,7 +14,7 @@ function MealDetailScreen({ route, navigation }) {
     navigation.dispatch(
       CommonActions.reset({
         index: 0,
-        routes: [{ name: "MealsCategories" }],
+        routes: [{ name: "DrawerScreen" }],
       })
     );
     console.log("Manu Button Pressed");
