@@ -1,91 +1,100 @@
 import { Ionicons } from "@expo/vector-icons";
-import { createDrawerNavigator } from "@react-navigation/drawer";
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { StatusBar } from "expo-status-bar";
 import { StyleSheet } from "react-native";
-import CategoriesScreen from "./screens/CategoriesScreen";
-import FavoritesScreen from "./screens/FavoritesScreen";
-import MealDetailScreen from "./screens/MealDetailScreen";
-import MealsOverviewScreen from "./screens/MealsOverviewScreen";
-// import FavoritesContextProvider from "./store/context/favorites-context";
-import { Provider } from "react-redux";
-import { store } from "./store/redux/store";
+import { GlobalStyles } from "./constants/styles";
+
+import { SafeAreaView } from "react-native-safe-area-context";
+import AddExpenseHeaderButton from "./components/UI/AddExpenseHeaderButton";
+import AllExpenses from "./screens/AllExpenses";
+import ManageExpense from "./screens/ManageExpense";
+import RecentExpenses from "./screens/RecentExpenses";
+import ExpenseContextProvider from "./store/context/expenses-context";
 
 const Stack = createNativeStackNavigator();
-const Drawer = createDrawerNavigator();
+const BottomTabs = createBottomTabNavigator();
 
-function DrawerNavigation() {
+function ExpensesOverView() {
   return (
-    <Drawer.Navigator
+    <BottomTabs.Navigator
       screenOptions={{
-        headerStyle: { backgroundColor: "#351401" },
+        headerStyle: { backgroundColor: GlobalStyles.colors.primary500 },
         headerTintColor: "white",
-        sceneContainerStyle: {
-          backgroundColor: "#4c3629ff", // drawer panel
-        },
-        drawerContentStyle: { backgroundColor: "#351401" },
-        drawerActiveTintColor: "#351401",
-        drawerInactiveTintColor: "white",
-        drawerActiveBackgroundColor: "#d1a88fff",
+        tabBarStyle: { backgroundColor: GlobalStyles.colors.primary500 },
+        tabBarActiveTintColor: GlobalStyles.colors.accent500,
+        headerRight: ({ tintColor }) => (
+          <AddExpenseHeaderButton
+            icon="bag-add"
+            size={24}
+            color={GlobalStyles.colors.white}
+          />
+        ),
       }}
     >
-      <Drawer.Screen
-        name="Categories"
-        component={CategoriesScreen}
+      <BottomTabs.Screen
+        name="RecentExpenses"
+        component={RecentExpenses}
         options={{
-          title: "All Categories",
-          drawerIcon: ({ color, size }) => (
-            <Ionicons name="list" color={color} size={size} />
+          title: "Recent Expenses",
+          tabBarLabel: "Recent",
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="hourglass" size={size} color={color} />
           ),
         }}
       />
-      <Drawer.Screen
-        name="Favorites"
-        component={FavoritesScreen}
+      <BottomTabs.Screen
+        name="AllExpenses"
+        component={AllExpenses}
         options={{
-          title: "Favorites",
-          drawerIcon: ({ color, size }) => (
-            <Ionicons name="star" color={color} size={size} />
+          title: "All Expenses",
+          tabBarLabel: "All Expenses",
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="calendar" size={size} color={color} />
           ),
         }}
       />
-    </Drawer.Navigator>
+    </BottomTabs.Navigator>
   );
 }
 
 export default function App() {
   return (
     <>
-      <StatusBar style="light" translucent={false} backgroundColor="#351401" />
-      {/* <FavoritesContextProvider> */}
-      <Provider store={store}>
-        <NavigationContainer>
-          <Stack.Navigator
-            screenOptions={{
-              headerStyle: { backgroundColor: "#351401" },
-              headerTintColor: "white",
-              contentStyle: {
-                backgroundColor: "#4c3629ff",
-              },
-            }}
-          >
-            <Stack.Screen
-              name="DrawerScreen"
-              component={DrawerNavigation}
-              options={{
-                headerShown: false,
+      <SafeAreaView style={{ flex: 1 }}>
+        <StatusBar
+          style="light"
+          backgroundColor={GlobalStyles.colors.primary500}
+        />
+        <ExpenseContextProvider>
+          <NavigationContainer>
+            <Stack.Navigator
+              screenOptions={{
+                headerShown: true,
+                headerStyle: {
+                  backgroundColor: GlobalStyles.colors.primary500,
+                },
+                headerTintColor: GlobalStyles.colors.white,
               }}
-            />
-            <Stack.Screen
-              name="MealsOverview"
-              component={MealsOverviewScreen}
-            />
-            <Stack.Screen name="MealDetail" component={MealDetailScreen} />
-          </Stack.Navigator>
-        </NavigationContainer>
-        {/* </FavoritesContextProvider> */}
-      </Provider>
+            >
+              <Stack.Screen
+                name="ExpenseOverview"
+                component={ExpensesOverView}
+                options={{ headerShown: false }}
+              />
+              <Stack.Screen
+                name="ManageExpense"
+                component={ManageExpense}
+                options={{
+                  title: "Manage Expense",
+                  animation: "slide_from_bottom",
+                }}
+              />
+            </Stack.Navigator>
+          </NavigationContainer>
+        </ExpenseContextProvider>
+      </SafeAreaView>
     </>
   );
 }
@@ -93,7 +102,6 @@ export default function App() {
 const styles = StyleSheet.create({
   rootScreen: {
     flex: 1,
-    marginTop: 16,
     backgroundColor: "#fff",
     alignItems: "center",
     justifyContent: "center",
