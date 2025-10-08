@@ -1,19 +1,43 @@
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { StatusBar } from "expo-status-bar";
-import { StyleSheet } from "react-native";
+import { useEffect, useState } from "react";
+import { ActivityIndicator, StyleSheet, View } from "react-native";
 import IconButton from "./components/UI/IconButton";
 import { Colors } from "./constants/styles";
 import AddPlace from "./screens/AddPlace";
 import AllPlaces from "./screens/AllPlaces";
+import { initDB } from "./util/database";
 
 const Stack = createNativeStackNavigator();
 
 export default function App() {
+  const [dbInitialized, setDbInitialized] = useState(false);
+
+  useEffect(() => {
+    async function setupDB() {
+      try {
+        await initDB();
+        setDbInitialized(true);
+      } catch (err) {
+        console.error("❌ Failed to init database:", err);
+      }
+    }
+    setupDB();
+  }, []);
+
+  if (!dbInitialized) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color={Colors.primary500} />
+      </View>
+    );
+  }
+
   return (
     <>
       <StatusBar
-        style="inverted"
+        style="auto"
         translucent={false}
         backgroundColor={Colors.primary500}
       />
@@ -61,5 +85,11 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     alignItems: "center",
     justifyContent: "center",
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: Colors.gray700,
   },
 });

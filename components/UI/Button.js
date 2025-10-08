@@ -4,14 +4,16 @@ import { Colors } from "../../constants/styles";
 
 function Button({ children, onPress }) {
   return (
-    <Pressable
-      style={({ pressed }) => [styles.button, pressed && styles.pressed]}
-      onPress={onPress}
-    >
-      <View>
-        <Text style={styles.buttonText}>{children}</Text>
-      </View>
-    </Pressable>
+    <View style={{ margin: 16 }}>
+      <Pressable
+        style={({ pressed }) => [styles.button, pressed && styles.pressed]}
+        onPress={onPress}
+      >
+        <View>
+          <Text style={styles.buttonText}>{children}</Text>
+        </View>
+      </Pressable>
+    </View>
   );
 }
 

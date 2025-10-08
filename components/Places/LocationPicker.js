@@ -1,9 +1,58 @@
-import { StyleSheet, View } from "react-native";
+import {
+  getCurrentPositionAsync,
+  PermissionStatus,
+  useForegroundPermissions,
+} from "expo-location";
+import { useState } from "react";
+import { Alert, StyleSheet, View } from "react-native";
 import { Colors } from "../../constants/styles";
 import OutlinedButton from "../UI/OutlineButton";
 
-function LocationPicker() {
-  function getLocationHandler() {}
+function LocationPicker({ onPickLocation }) {
+  const [locationPermissionInformation, requestPermission] =
+    useForegroundPermissions();
+  const [pickedLocation, setPickedLocation] = useState("");
+
+  async function verifyPermissions() {
+    if (
+      locationPermissionInformation.status === PermissionStatus.UNDETERMINED
+    ) {
+      const permissionResponse = await requestPermission();
+
+      return permissionResponse.granted;
+    }
+
+    if (locationPermissionInformation.status === PermissionStatus.DENIED) {
+      Alert.alert(
+        "Insufficient Permissions!",
+        "You need to grant Location permissions to use this app."
+      );
+      return false;
+    }
+
+    return true;
+  }
+
+  async function getLocationHandler() {
+    const hasPermission = await verifyPermissions();
+
+    if (!hasPermission) {
+      return;
+    }
+
+    const location = await getCurrentPositionAsync();
+    console.log(location);
+
+    setPickedLocation({
+      lat: location.coords.latitude,
+      lng: location.coords.longitude,
+    });
+    onPickLocation({
+      ...pickedLocation,
+      address:
+        "1600 Amphitheatre Parkway, Mountain View, CA 94043, United States",
+    });
+  }
 
   function pickOnMapHandler() {}
   return (
